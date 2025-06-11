@@ -9,3 +9,10 @@ from django.http import HttpResponse
 def home(request):
     # Send a simple HTML response
     return HttpResponse('<h1>Hello ᓚᘏᗢ</h1>')
+
+def about(request):
+    return render(request, 'about.html')
+
+def recipe_index(request):
+    # Render the recipes/index.html with the data
+    return render(request, 'recipes/index.html', {'recipes': recipes })

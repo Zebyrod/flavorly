@@ -5,4 +5,6 @@ from . import views # Import views to connect routes to view functions
 urlpatterns = [
     # Routes will be added here
     path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('recipes/', views.recipe_index, name='recipe-index'),
 ]
