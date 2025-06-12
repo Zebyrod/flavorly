@@ -1,8 +1,32 @@
-{% extends 'base.html' %} {% load static %} {% block head %}
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
 <link rel="stylesheet" href="{% static 'css/recipes/recipe-index.css' %}"/>
-{% endblock %} {% block content %}
+{% endblock %}
 
-<section class="page-header">
-    <h1>All Recipes</h1>
-    
+{% block content %}
+<section class="page-header text-center my-5">
+    <h1 class="mb-4 display-3">All Recipes</h1>
+    <div class="d-flex justify-content-center gap-4">
+        <img src="{% static 'images/cook-book.svg' %}" alt="A cook book" class="img-fluid" style="height: 100px;">
+        <img src="{% static 'images/cook-logo.svg' %}" alt="Chef logo" class="img-fluid" style="height: 100px;">
+        <img src="{% static 'images/cooking-pot.svg' %}" alt="Cooking Pot" class="img-fluid" style="height: 100px;">
+    </div>
 </section>
+
+<section class="container">
+  <div class="row row-cols-1 row-cols-md-3 g-5">
+    {% for recipe in recipes %}
+      <div class="col">
+        <div class="card h-100 shadow-sm p-4">
+          <a href="{% url 'recipe-detail' recipe.id %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <h3 class="card-title fs-2">{{ recipe.name }}</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
