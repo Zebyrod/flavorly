@@ -1,15 +1,28 @@
-{% extends 'base.html' %} 
-{% load static %} 
-{% block head %}
-<link rel="stylesheet" href="{% static 'css/recipes/recipe-detail.css' %}" />
-{ %endblock %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <section class="recipe-container">
-    <div class="recipe-details">
-        <h1>{{ recipe.name }}</h1>
-        <h2>{{ recipe.recipe_type }}</h2>
-        <h2>{{ recipe.ingredients }}</h2>
-        <h2>{{ recipe.instructions }}</h2>
+	<div class="recipe-details container py-5">
+		<h1 class="mb-4">Recipe: {{ recipe.name }}</h1>
+		<h4 class="mb-3"><strong>Type:</strong> {{ recipe.recipe_type }}</h4>
 
-    </div>
+		<a href="{% url 'recipe-edit' recipe.pk %}" class="btn btn-warning mb-3"
+			>Edit Recipe</a
+		>
+
+		<h4 class="mt-4 mb-2"><strong>Ingredients:</strong></h4>
+		<ul class="list-group mb-4">
+			{% for ingredient in ingredients %}
+			<li class="list-group-item">
+                <!-- Had to add a conditional here to remove the unit string showing up. If you do a whole of an item it will show up as 2 unit item -->
+				{{ ingredient.amount }}{% if ingredient.unit != 'unit' %} {{
+				ingredient.unit }}{% endif %} {{ ingredient.name }}
+			</li>
+			{% empty %}
+			<li class="list-group-item">No ingredients listed.</li>
+			{% endfor %}
+		</ul>
+
+		<h4 class="mb-2"><strong>Instructions:</strong></h4>
+		<p>{{ recipe.instructions }}</p>
+	</div>
 </section>
+{% endblock %}
