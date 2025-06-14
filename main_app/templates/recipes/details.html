@@ -7,14 +7,16 @@
 		<a href="{% url 'recipe-edit' recipe.pk %}" class="btn btn-warning mb-3"
 			>Edit Recipe</a
 		>
+		<a href="{% url 'recipe-delete' recipe.pk %}" class="btn btn-danger mb-3"
+			>Delete Recipe</a
+		>
 
 		<h4 class="mt-4 mb-2"><strong>Ingredients:</strong></h4>
 		<ul class="list-group mb-4">
 			{% for ingredient in ingredients %}
 			<li class="list-group-item">
-                <!-- Had to add a conditional here to remove the unit string showing up. If you do a whole of an item it will show up as 2 unit item -->
-				{{ ingredient.amount }}{% if ingredient.unit != 'unit' %} {{
-				ingredient.unit }}{% endif %} {{ ingredient.name }}
+				<!-- Had to add a conditional here to remove the unit string showing up. If you do a whole of an item it will show up as 2 unit item -->
+				{{ ingredient.amount }}{% if ingredient.unit != 'unit' %} {{ ingredient.get_unit_display }} {% endif %} {{ ingredient.name }}
 			</li>
 			{% empty %}
 			<li class="list-group-item">No ingredients listed.</li>
