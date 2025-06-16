@@ -1,30 +1,36 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
 <section class="recipe-container">
-	<div class="recipe-details container py-5">
-		<h1 class="mb-4">Recipe: {{ recipe.name }}</h1>
-		<h4 class="mb-3"><strong>Type:</strong> {{ recipe.recipe_type }}</h4>
+  <div class="recipe-details container py-5">
+    <h1 class="mb-4">Recipe: {{ recipe.name }}</h1>
+    <h4 class="mb-3"><strong>Type:</strong> {{ recipe.recipe_type }}</h4>
 
-		<a href="{% url 'recipe-edit' recipe.pk %}" class="btn btn-warning mb-3"
-			>Edit Recipe</a
-		>
-		<a href="{% url 'recipe-delete' recipe.pk %}" class="btn btn-danger mb-3"
-			>Delete Recipe</a
-		>
+    <div class="mb-3">
+      <a href="{% url 'recipe-edit' recipe.pk %}" class="btn btn-warning me-2" aria-label="Edit recipe">Edit Recipe</a>
+      <a href="{% url 'recipe-delete' recipe.pk %}" class="btn btn-danger" aria-label="Delete recipe">Delete Recipe</a>
+    </div>
 
-		<h4 class="mt-4 mb-2"><strong>Ingredients:</strong></h4>
-		<ul class="list-group mb-4">
-			{% for ingredient in ingredients %}
-			<li class="list-group-item">
-				<!-- Had to add a conditional here to remove the unit string showing up. If you do a whole of an item it will show up as 2 unit item -->
-				{{ ingredient.amount }}{% if ingredient.unit != 'unit' %} {{ ingredient.get_unit_display }} {% endif %} {{ ingredient.name }}
-			</li>
-			{% empty %}
-			<li class="list-group-item">No ingredients listed.</li>
-			{% endfor %}
-		</ul>
+    <h4 class="mt-4 mb-2"><strong>Ingredients:</strong></h4>
+    <ul class="list-group mb-3">
+      {% for ingredient in ingredients %}
+        <li class="list-group-item">
+          {{ ingredient.amount }}
+          {% if ingredient.unit != 'unit' %}
+            {{ ingredient.get_unit_display }}
+          {% endif %}
+          {{ ingredient.name }}
+        </li>
+      {% empty %}
+        <li class="list-group-item">No ingredients listed.</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'ingredient-list' recipe.pk %}" class="btn btn-primary mb-4">Manage Ingredients</a>
 
-		<h4 class="mb-2"><strong>Instructions:</strong></h4>
-		<p>{{ recipe.instructions }}</p>
-	</div>
+    <h4 class="mb-2"><strong>Instructions:</strong></h4>
+    <p>{{ recipe.instructions }}</p>
+
+    <a href="{% url 'recipe-index' %}" class="btn btn-outline-secondary mt-4">Back to Recipes</a>
+  </div>
 </section>
 {% endblock %}

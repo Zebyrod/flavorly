@@ -2,77 +2,31 @@
 {% load static %}
 
 {% block content %}
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
+<section class="container my-5">
+  <h1 class="mb-4">{{ form.instance.pk|yesno:"Edit Recipe,Create Recipe" }}</h1>
 
-  {{ ingredient_formset.management_form }}
-  <div id="ingredient-forms">
-    {% for form in ingredient_formset %}
-      <div class="ingredient-form row g-3 align-items-center mb-3">
-        <div class="col-md-3">
-          {{ form.amount.label_tag }}
-          {{ form.amount }}
-        </div>
-        <div class="col-md-4">
-          {{ form.unit.label_tag }}
-          {{ form.unit }}
-        </div>
-        <div class="col-md-5">
-          {{ form.name.label_tag }}
-          {{ form.name }}
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.name.label_tag }}
+      {{ form.name }}
+    </div>
+    <div class="mb-3">
+      {{ form.recipe_type.label_tag }}
+      {{ form.recipe_type }}
+    </div>
+    <div class="mb-3">
+      {{ form.instructions.label_tag }}
+      {{ form.instructions }}
+    </div>
 
-  <div class="d-flex justify-content-between mb-3">
-    <button type="button" id="add-ingredient" class="btn btn-secondary">Add Ingredient</button>
     <button type="submit" class="btn btn-primary">Save Recipe</button>
-  </div>
-</form>
-</div>
+  </form>
 
-<!-- I used chatgpt to assist me with using JS to dynamically render new forms when the user added an ingredient. I especially used it to assist me with the selectors of my bootstrap styling as I was getting lost in my different styles -->
-<script>
-  // Grab the container holding the forms and the total forms count input
-  const ingredientFormsContainer = document.getElementById('ingredient-forms');
-  const totalFormsInput = document.querySelector('#id_ingredients-TOTAL_FORMS');
-  const addIngredientButton = document.getElementById('add-ingredient');
-
-  addIngredientButton.addEventListener('click', () => {
-    // Get the current number of forms
-    let totalForms = parseInt(totalFormsInput.value);
-
-    // Clone the last form
-    const lastForm = ingredientFormsContainer.querySelector('.ingredient-form:last-child');
-    const newForm = lastForm.cloneNode(true);
-
-    // Update form fields names and ids
-    newForm.querySelectorAll('input, select').forEach(input => {
-      // Update 'name' attribute
-      const name = input.getAttribute('name');
-      if (name) {
-        const newName = name.replace(/-\d+-/, `-${totalForms}-`);
-        input.setAttribute('name', newName);
-      }
-      // Update 'id' attribute
-      const id = input.getAttribute('id');
-      if (id) {
-        const newId = id.replace(/-\d+-/, `-${totalForms}-`);
-        input.setAttribute('id', newId);
-      }
-      // Clear the value for new form
-      if (input.type !== 'hidden') {
-        input.value = '';
-      }
-    });
-
-    // Append the new form to the container
-    ingredientFormsContainer.appendChild(newForm);
-
-    // Increment TOTAL_FORMS
-    totalFormsInput.value = totalForms + 1;
-  });
-</script>
+  {% if form.instance.pk %}
+    <hr>
+    <h2 class="mt-5">Ingredients</h2>
+    <a href="{% url 'ingredient-list' recipe_id=form.instance.pk %}" class="btn btn-secondary mt-3">Manage Ingredients</a>
+  {% endif %}
+</section>
 {% endblock %}
