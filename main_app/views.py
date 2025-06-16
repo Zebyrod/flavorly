@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 from .models import Recipe, Ingredient
 from .forms import RecipeForm, IngredientForm
 
@@ -39,6 +40,7 @@ def recipe_create(request):
             recipe = form.save(commit=False)
             recipe.user = request.user
             recipe.save()
+            messages.success(request, f"Recipe '{recipe.name}' created successfully!")
             return redirect('recipe-detail', recipe_id=recipe.id)
     else:
         form = RecipeForm()
@@ -54,6 +56,7 @@ def recipe_update(request, recipe_id):
         form = RecipeForm(request.POST, instance=recipe)
         if form.is_valid():
             form.save()
+            messages.success(request, f"Recipe '{recipe.name}' updated successfully!")
             return redirect('recipe-detail', recipe_id=recipe.id)
     else:
         form = RecipeForm(instance=recipe)
@@ -67,6 +70,7 @@ def recipe_delete(request, recipe_id):
 
     if request.method == 'POST':
         recipe.delete()
+        messages.success(request, f"Recipe '{recipe.name}' deleted successfully.")
         return redirect('recipe-index')
 
     return render(request, 'recipes/recipe_confirm_delete.html', {'recipe': recipe})
@@ -92,6 +96,7 @@ def ingredient_create(request, recipe_id):
             ingredient = form.save(commit=False)
             ingredient.recipe = recipe
             ingredient.save()
+            messages.success(request, f"Ingredient '{ingredient.name}' added to '{recipe.name}'.")
             return redirect('ingredient-list', recipe_id=recipe.id)
     else:
         form = IngredientForm()
@@ -107,6 +112,7 @@ def ingredient_delete(request, recipe_id, ingredient_id):
 
     if request.method == 'POST':
         ingredient.delete()
+        messages.success(request, f"Ingredient '{ingredient.name}' deleted from '{recipe.name}'.")
         return redirect('ingredient-list', recipe_id=recipe.id)
 
     return render(request, 'ingredients/ingredient_confirm_delete.html', {
@@ -120,6 +126,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Log the user in immediately after signup
+            messages.success(request, f"Welcome, {user.username}! Your account has been created.")
             return redirect('home')  
     else:
         form = UserCreationForm()

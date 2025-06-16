@@ -15,6 +15,23 @@
 
 		<title>Flavorly</title>
 		{% block head %} {% endblock %}
+		<style>
+      /* Toast container below navbar */
+      #toast-container {
+        position: relative;
+        margin-top: 1rem; /* space below navbar */
+        z-index: 1050; /* same as navbar */
+        width: fit-content;
+        max-width: 350px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      /* Toast styling */
+      #toast-container .toast {
+        min-width: 250px;
+        margin-bottom: 0.5rem;
+      }
+		</style>
 	</head>
 	<body>
 		<header>
@@ -54,20 +71,17 @@
 								<a class="nav-link" href="/about">About</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="{% url 'recipe-create' %}"
-									>Create Recipe</a
-								>
+								<a class="nav-link" href="{% url 'recipe-create' %}">Create Recipe</a>
 							</li>
 
 							{% if user.is_authenticated %}
 							<li class="nav-item d-flex align-items-center">
-  <form method="POST" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-link nav-link p-0" style="color: inherit; text-decoration: none;">
-      Logout
-    </button>
-  </form>
-</li>
+								<form method="POST" action="{% url 'logout' %}">
+									{% csrf_token %}
+									<button type="submit" class="btn btn-link nav-link p-0" style="color: inherit; text-decoration: none;">
+										Logout
+									</button>
+								</form>
 							</li>
 							{% else %}
 							<li class="nav-item">
@@ -82,11 +96,47 @@
 				</div>
 			</nav>
 		</header>
+
+		<!-- Toast container below navbar -->
+		<div id="toast-container" aria-live="polite" aria-atomic="true" class="position-relative">
+			{% if messages %}
+				{% for message in messages %}
+					<div
+						class="toast align-items-center text-bg-{{ message.tags }} border-0 show"
+						role="alert"
+						aria-live="assertive"
+						aria-atomic="true"
+					>
+						<div class="d-flex">
+							<div class="toast-body">
+								{{ message }}
+							</div>
+							<button
+								type="button"
+								class="btn-close btn-close-white me-2 m-auto"
+								data-bs-dismiss="toast"
+								aria-label="Close"
+							></button>
+						</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+
 		<main>{% block content %} {% endblock %}</main>
+
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
 			crossorigin="anonymous"
 		></script>
+
+		<!-- Toast init script -->
+		<script>
+			// Initialize all toast elements so the close button works
+			document.querySelectorAll('.toast').forEach((toastNode) => {
+				new bootstrap.Toast(toastNode).show();
+			});
+		</script>
 	</body>
 </html>
