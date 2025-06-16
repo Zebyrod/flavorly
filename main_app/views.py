@@ -14,7 +14,7 @@ def about(request):
     return render(request, 'about.html')
 
 
-# Recipe Views
+# Recipe Views Function based views 
 
 @login_required
 def recipe_index(request):
@@ -76,7 +76,7 @@ def recipe_delete(request, recipe_id):
     return render(request, 'recipes/recipe_confirm_delete.html', {'recipe': recipe})
 
 
-# Ingredient Views
+# Ingredient Views function based views 
 
 @login_required
 def ingredient_list(request, recipe_id):
