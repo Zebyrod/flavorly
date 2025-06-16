@@ -1,12 +1,7 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 from .models import Recipe, Ingredient
 from .forms import RecipeForm, IngredientForm
-
-# Create your views here.
 
 # Home and About Views
 def home(request):
@@ -15,6 +10,7 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
+
 # Recipe Views
 
 @login_required
@@ -22,6 +18,7 @@ def recipe_index(request):
     recipes = Recipe.objects.filter(user=request.user)
     return render(request, 'recipes/index.html', {'recipes': recipes})
 
+@login_required
 def recipe_detail(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
     ingredients = Ingredient.objects.filter(recipe=recipe)
@@ -33,52 +30,45 @@ def recipe_detail(request, recipe_id):
     })
 
 @login_required
-def add_ingredient(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id)
+def recipe_create(request):
     if request.method == 'POST':
-        form = IngredientForm(request.POST)
+        form = RecipeForm(request.POST)
         if form.is_valid():
-            ingredient = form.save(commit=False)
-            ingredient.recipe = recipe
-            ingredient.save()
-    return redirect('recipe-detail', recipe_id=recipe_id)
+            recipe = form.save(commit=False)
+            recipe.user = request.user
+            recipe.save()
+            return redirect('recipe-detail', recipe_id=recipe.id)
+    else:
+        form = RecipeForm()
+    return render(request, 'recipes/recipe_form.html', {'form': form})
 
-class RecipeCreateView(LoginRequiredMixin, CreateView):
-    model = Recipe
-    form_class = RecipeForm
-    template_name = 'recipes/recipe_form.html'
+@login_required
+def recipe_update(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    if recipe.user != request.user:
+        return redirect('recipe-index')  # simple permission check
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, instance=recipe)
+        if form.is_valid():
+            form.save()
+            return redirect('recipe-detail', recipe_id=recipe.id)
+    else:
+        form = RecipeForm(instance=recipe)
+    return render(request, 'recipes/recipe_form.html', {'form': form, 'recipe': recipe})
 
-    def get_success_url(self):
-        return reverse('recipe-detail', kwargs={'recipe_id': self.object.pk})
+@login_required
+def recipe_delete(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    if recipe.user != request.user:
+        return redirect('recipe-index')
 
-class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Recipe
-    form_class = RecipeForm
-    template_name = 'recipes/recipe_form.html'
-    pk_url_kwarg = 'recipe_id'
+    if request.method == 'POST':
+        recipe.delete()
+        return redirect('recipe-index')
 
-    def test_func(self):
-        recipe = self.get_object()
-        return recipe.user == self.request.user
+    return render(request, 'recipes/recipe_confirm_delete.html', {'recipe': recipe})
 
-    def get_success_url(self):
-        return reverse('recipe-detail', kwargs={'recipe_id': self.object.pk})
-
-class RecipeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Recipe
-    template_name = 'recipes/recipe_confirm_delete.html'
-    pk_url_kwarg = 'recipe_id'
-
-    def test_func(self):
-        recipe = self.get_object()
-        return recipe.user == self.request.user
-
-    def get_success_url(self):
-        return reverse('recipe-index')
 
 # Ingredient Views
 
@@ -86,7 +76,10 @@ class RecipeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def ingredient_list(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
     ingredients = Ingredient.objects.filter(recipe=recipe)
-    return render(request, 'ingredients/ingredient_list.html', {'recipe': recipe, 'ingredients': ingredients})
+    return render(request, 'ingredients/ingredient_list.html', {
+        'recipe': recipe,
+        'ingredients': ingredients
+    })
 
 @login_required
 def ingredient_create(request, recipe_id):
@@ -97,29 +90,24 @@ def ingredient_create(request, recipe_id):
             ingredient = form.save(commit=False)
             ingredient.recipe = recipe
             ingredient.save()
-            return redirect('ingredient-list', recipe_id=recipe_id)
+            return redirect('ingredient-list', recipe_id=recipe.id)
     else:
         form = IngredientForm()
-    return render(request, 'ingredients/ingredient_form.html', {'form': form, 'recipe': recipe})
-
-@login_required
-def ingredient_update(request, recipe_id, ingredient_id):
-    recipe = Recipe.objects.get(id=recipe_id)
-    ingredient = Ingredient.objects.get(id=ingredient_id, recipe=recipe)
-    if request.method == 'POST':
-        form = IngredientForm(request.POST, instance=ingredient)
-        if form.is_valid():
-            form.save()
-            return redirect('ingredient-list', recipe_id=recipe_id)
-    else:
-        form = IngredientForm(instance=ingredient)
-    return render(request, 'ingredients/ingredient_form.html', {'form': form, 'recipe': recipe})
+    return render(request, 'ingredients/ingredient_form.html', {
+        'form': form,
+        'recipe': recipe
+    })
 
 @login_required
 def ingredient_delete(request, recipe_id, ingredient_id):
     recipe = Recipe.objects.get(id=recipe_id)
     ingredient = Ingredient.objects.get(id=ingredient_id, recipe=recipe)
+
     if request.method == 'POST':
         ingredient.delete()
-        return redirect('ingredient-list', recipe_id=recipe_id)
-    return render(request, 'ingredients/ingredient_confirm_delete.html', {'ingredient': ingredient, 'recipe': recipe})
+        return redirect('ingredient-list', recipe_id=recipe.id)
+
+    return render(request, 'ingredients/ingredient_confirm_delete.html', {
+        'ingredient': ingredient,
+        'recipe': recipe
+    })

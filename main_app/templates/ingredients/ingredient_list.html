@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/ingredients/ingredient-list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <h1 class="mb-4">Ingredients List</h1>
+
+  {% if ingredients %}
+    <ul class="list-group">
+      {% for ingredient in ingredients %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ ingredient.name }}
+          <span>
+            {{ ingredient.amount }}{% if ingredient.unit != 'unit' %} {{ ingredient.get_unit_display }}{% endif %}
+          </span>
+          <!-- Delete button -->
+          <a href="{% url 'ingredient-delete' recipe.id ingredient.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No ingredients found. <a href="{% url 'ingredient-create' recipe.id %}">Add an ingredient</a> to get started!</p>
+  {% endif %}
+
+  <a href="{% url 'ingredient-create' recipe.id %}" class="btn btn-primary mt-3">Add Ingredient</a>
+  <a href="{% url 'recipe-detail' recipe.id %}" class="btn btn-secondary mt-3 me-2">Back to Recipe</a>
+</section>
+{% endblock %}

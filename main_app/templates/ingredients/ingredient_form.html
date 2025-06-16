@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/ingredients/ingredient-form.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <h1 class="mb-4">{{ form.instance.pk|yesno:"Edit Ingredient,Create Ingredient" }}</h1>
+  <form method="POST" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary mt-3">Save Ingredient</button>
+    <a href="{% url 'ingredient-list' recipe.id %}" class="btn btn-secondary mt-3 ms-2">Cancel</a>
+  </form>
+</section>
+{% endblock %}
