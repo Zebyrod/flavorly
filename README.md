@@ -69,10 +69,10 @@ In the future, I’d like to improve the look of the app by adding images for re
 
 ## Github repository
 * You can view the repository:
-[Github.com](https://github.com/Zebyrod/flavorly)
+[Github.com](https://flavorly-54ac51c1c004.herokuapp.com)
 * If unable to view please go live locally through VS Code
 
-[Flavorly]()
+[Flavorly](https://github.com/Zebyrod/flavorly)
 
 ## <a name="Zebastian Rodriguez"></a>The Developer
 * Zebastian [GitHub](https://github.com/Zebyrod) [LinkedIn](https://www.linkedin.com/in/zebastian-rodriguez-480191309/)
